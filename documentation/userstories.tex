@@ -1,0 +1,81 @@
+\chapter*{User Stories}
+This section describes several of the user stories that are expected to be covered by the Logistical Operations Service Tracker (Lost). User stories are ordered by user type and high level task. Each user story provides a high level user objective and possible user interface process to complete the task.
+
+
+\section*{Classifier}
+\subsection*{Change Asset Compartments}
+\subsubsection*{Objective}
+Classifier is changing the compartments associated with an asset.
+\subsubsection*{Experience}
+Classifier navigates to the asset using the LOST UI. After selecting the asset, Classifier chooses to edit the asset properties. Classifier is able to change (add and remove) compartments the asset is associated with. Classifier is prompted to save changes before they take effect.
+
+
+\subsection*{Change Product Compartments}
+\subsubsection*{Objective}
+Classifier is changing the compartments associated with a product.
+\subsubsection*{Experience}
+Classifier navigates to the product using the LOST UI. After selecting the product, Classifier chooses to edit the product properties. Classifier is able to change (add and remove) compartments the product is associated with. If the Classifier assigns compartments that are incompatibly with an existing asset, a warning is displayed. Classifier is prompted to save changes before they take effect.
+
+
+\section*{Assigner}
+\subsection*{Change User Compartments}
+\subsubsection*{Objective}
+Assigner is changing the compartments a user has access to.
+\subsubsection*{Experience}
+Assigner navigates to the user using the LOST UI. After selecting the user, the assigner is able to change (add and remove) compartments the user is associated with. Assigner is prompted to save changes before they take effect.
+
+\subsection*{Change User Facilities}
+\subsubsection*{Objective}
+Assigner is changing the facilities a user has access to.
+\subsubsection*{Experience}
+Assigner navigates to the user using the LOST UI. After selecting the user, the assigner is able to change facilities and vehicles the user is associated with. Assigner is prompted to save changes before they take effect.
+
+
+\section*{Logistics User}
+\subsection*{View Travel Requests}
+\subsubsection*{Objective}
+Logistics User wants to view travel requests needing service.
+\subsubsection*{Experience}
+Logistics logistics dashboard lists the travel requests this user might be able to assist with. The user selects a travel request and is shown the details. User updates the request.
+
+\subsection*{Request Transfer}
+\subsubsection*{Objective}
+Logistics User is moving an asset.
+\subsubsection*{Experience}
+Logistics User selects `new travel request' from the logistics dashboard. The user selects the source facility and assets to be transported then saves the request.
+
+\subsection*{Start Transfer}
+\subsubsection*{Objective}
+Logistics User is noting that at asset has started motion.
+\subsubsection*{Experience}
+After openning the travel request, the Logistics user changes the travel request state to loaded.
+
+\subsection*{Update Transfer}
+\subsubsection*{Objective}
+Logistics User is noting an intermediate change in asset location.
+\subsubsection*{Experience}
+After openning the travel request, the Logistics user updates the location to note that the asset has moved to a particular intermediate location.
+
+\subsection*{Receive Transfer}
+\subsubsection*{Objective}
+Logistics User is noting arrival of an asset.
+\subsubsection*{Experience}
+After openning the travel request, the Logistics user clicks `transfer complete' to note that the asset has been received.
+
+
+\section*{Logistics Manager}
+\subsection*{LM Approve Travel Requests}
+\subsubsection*{Objective}
+Logistics approves a new travel requests.
+\subsubsection*{Experience}
+Logistics dashboard lists the new travel requests. The user selects a travel request and is shown the details. User selects approve. User then uses the UI to assemble the convoy to move the asset.
+
+
+\section*{Facility Manager}
+\subsection*{FM Approve Travel Requests}
+\subsubsection*{Objective}
+Facilities approves a new travel requests.
+\subsubsection*{Experience}
+Facilities dashboard lists the new travel requests. The user selects a travel request and is shown the details. User selects approve.
+
+
