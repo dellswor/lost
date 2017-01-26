@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -12,4 +12,11 @@ def welcome():
 
 @app.route('/goodbye')
 def goodbye():
-    return render_template('goodbye.html')
+    if request.method=='GET' and 'mytext' in request.args:
+        return render_template('goodbye.html')
+
+    # request.form is only populated for POST messages
+    if request.method=='POST' and 'mytext' in request.form:
+        return render_template('goodbye.html')
+    return render_template('index.html')
+
