@@ -13,10 +13,10 @@ def welcome():
 @app.route('/goodbye')
 def goodbye():
     if request.method=='GET' and 'mytext' in request.args:
-        return render_template('goodbye.html')
+        return render_template('goodbye.html',data=request.args.get('mytext'))
 
     # request.form is only populated for POST messages
     if request.method=='POST' and 'mytext' in request.form:
-        return render_template('goodbye.html')
+        return render_template('goodbye.html',data=request.form['mytext'])
     return render_template('index.html')
 
