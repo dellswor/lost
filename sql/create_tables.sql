@@ -2,7 +2,10 @@ create table products (
     product_pk      serial primary key,
     vendor          varchar(128) not null,
     description     text,
-    alt_description text
+    alt_description text,
+    product_name    varchar(128),
+    product_model   varchar(128),
+    price           numeric
 );
 
 create table assets (
