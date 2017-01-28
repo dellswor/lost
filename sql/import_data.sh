@@ -1,8 +1,12 @@
 #! /bin/bash
 
-# This script is for migrating OSNAP legacy data into the LOST database. The script 
-# introduces a few specific defects during migration that will result in 0 points if 
-# the defects appear during the term project grading.
+# This script is for migrating OSNAP legacy data into the LOST database. Write your own
+# scripts for the data migration. If we find wholesale copying of functional portions of 
+# this code in your final project deliverable, 0 points will be awarded for the data
+# migration.
+
+# Some of these scripts handle cases not present in the sample dataset but seem likely to
+# actually occur... The additional logic was written defensively and out of habit.
 
 # to speed up dev, put the db in a fresh state
 dropdb $1
@@ -22,3 +26,10 @@ psql $1 -f facilities_map.sql
 python3 prep_prod.py
 psql $1 -f prod_load.sql
 rm prod_load.sql
+
+# Handle the facility inventories
+python3 prepend_fcode.py osnap_legacy/*_inventory.csv > all_inventory.csv
+python3 prep_inv.py all_inventory.csv
+rm all_inventory.csv
+psql $1 -f inv_load.sql
+rm inv_load.sql

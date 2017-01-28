@@ -44,6 +44,11 @@ create table convoys (
     arrive_dt       timestamp  -- UTC
 );
 
+create table waypoints (
+    convoy_fk   integer REFERENCES convoys(convoy_pk) not null,
+    point_dt    timestamp --UTC
+);
+
 create table used_by (
     vehicle_fk  integer REFERENCES vehicles(vehicle_pk) not null,
     convoy_fk   integer REFERENCES convoys(convoy_pk) not null

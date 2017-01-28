@@ -14,7 +14,6 @@ def process_products(outf):
                     pass
                 else:
                     r[k]="'%s'"%r[k] # if single quotes are in the data this will fail
-                print("%s: %s"%(k,r[k]))
                     
             # Add the product entry
             outf.write("INSERT INTO products (vendor,product_name,product_model,description,price) VALUES (%s,%s,%s,%s,%s);\n"%(r['vendor'],r['name'],r['model'],r['description'],r['unit price']))
