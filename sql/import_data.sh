@@ -43,3 +43,5 @@ rm transit.csv
 
 # Handle the convoy data, add waypoints and missing assets
 python3 waypoints.py $1 $2
+
+# Need to backfill some asset records that can be inferred from the imported data
