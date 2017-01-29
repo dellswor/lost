@@ -45,3 +45,4 @@ rm transit.csv
 python3 waypoints.py $1 $2
 
 # Need to backfill some asset records that can be inferred from the imported data
+psql $1 -f backfill.sql
