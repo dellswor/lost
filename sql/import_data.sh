@@ -39,7 +39,7 @@ python3 norm_tags.py > transit.csv
 # This next step gets tricky, the assets may or may not exist in the data...
 # Would be easier if Postgres supported UPSERT by default.
 python3 do_transit.py $1 $2
-
-# Backfill some asset locations based on the transit records
+rm transit.csv
 
 # Handle the convoy data, add waypoints and missing assets
+python3 waypoints.py $1 $2
