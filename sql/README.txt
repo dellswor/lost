@@ -12,6 +12,7 @@ prep_prod.py        - Converts product info to sql
 prep_sec.py         - Converts security info to sql
 prepend_fcode       - Concatenates the inventory data and annotates with source facility
 waypoints.py        - Processes the convoy file
+backfill.sql        - A script to fill in a few inferrences
 
 
 

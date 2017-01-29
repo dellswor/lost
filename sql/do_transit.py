@@ -9,8 +9,13 @@ def normalize_date(s):
     if m:
         # slash style
         mon = int(m.group(1))
-        day = int(m.group(3))
-        yr  = int(m.group(2))
+        day = int(m.group(2))
+        yr  = int(m.group(3))
+        if yr < 100: # short year
+            if yr < 50: # assume current century
+                yr += 2000
+            else: # assume last century
+                yr += 1900
         return datetime.datetime(yr,mon,day)
         
     m = re.match(r'(\d+)-(\w{3})-(\d+)',s)
