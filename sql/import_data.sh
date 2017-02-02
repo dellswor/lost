@@ -9,9 +9,9 @@
 # actually occur... The additional logic was written defensively and out of habit.
 
 # to speed up dev, put the db in a fresh state
-dropdb $1
-createdb $1
-psql $1 -f create_tables.sql
+#dropdb $1
+#createdb $1
+#psql $1 -f create_tables.sql
 
 # Load the security data
 python3 prep_sec.py
