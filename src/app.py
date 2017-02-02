@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from config import dbname, dbhost, dbport
 
 app = Flask(__name__)
 
@@ -8,7 +9,7 @@ def index():
 
 @app.route('/welcome')
 def welcome():
-    return render_template('welcome.html')
+    return render_template('welcome.html',dbname=dbname,dbhost=dbhost,dbport=dbport)
 
 @app.route('/goodbye')
 def goodbye():
