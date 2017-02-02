@@ -10,6 +10,8 @@ Redirects should be used to point the user to the correct next page after their 
 
 Files:
 app.py - A Flask app to be run via mod_wsgi
+config.py - Logic to find and read the configuration into memory
+lost_config.json - a sample configuration file
 templates/
     index.html - a template for the root path
     welcome.html - a template for the welcome page
