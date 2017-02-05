@@ -1,6 +1,7 @@
 # This client can be used to interact with the LOST interface prior to encryption
 # implementation
 
+import json
 import sys
 
 # URL lib parts
@@ -25,7 +26,10 @@ def main():
     res = urlopen(req)
     
     # Spool the results to the user
-    print(res.read())
+    dat = res.read().decode("utf-8")
+    print(dat)
+    resp = json.loads(dat)
+    print(resp)
 
 if __name__=='__main__':
     main()

@@ -22,7 +22,7 @@ def suspend_user():
     dat['timestamp'] = req['timestamp']
     dat['result'] = 'OK'
     data = json.dumps(dat)
-    return render_template('api_dat.html',data=data)
+    return data
 
 @app.route('/goodbye')
 def goodbye():
