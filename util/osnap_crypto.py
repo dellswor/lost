@@ -16,17 +16,17 @@ import base64
 def _gen_sig(key, message):
     h = SHA3_256.new(message)
     sig = pkcs1_15.new(key).sign(h)
-    return base64.encode(sig)
+    return base64.b64encode(sig)
 
 def _check_sig(key, message, sig):
     h = SHA3_256.new(message)
-    sig = base64.unencode(sig)
+    sig = base64.b64decode(sig)
     try:
         pkcs1_15.new(key).verify(h, sig)
     except (ValueError, TypeError):
         raise OSNAPSecurityException("Signature did not verify")
     return True
-    
+
 class OSNAPSecurityException(Exception):
     pass
     
@@ -45,29 +45,35 @@ def encrypt_and_sign(plaintext, recipient_pub, sender_priv):
     # encrypt the symmetric key
     skey_e = cipher_rsa.encrypt(skey)
     # encrypt the message
-    cipher_text, tag = cipher_aes.encrypt_and_digest(plain_text)
-    data = bytes.join(skey_e, cipher_aes.nonce, tag, cipher_text)
+    cipher_text, tag = cipher_aes.encrypt_and_digest(plaintext.encode('utf-8'))
+    data = b''.join([skey_e, cipher_aes.nonce, tag, cipher_text])
     
     # Read the asymmetric key -- Must be the sender's private key
     with open(sender_priv,"rb") as keyfile:
         key = RSA.import_key(keyfile.read())
     sig  = _gen_sig(key, data)
     
-    return (base64.encode(data), base64.encode(sig))
+    return (base64.b64encode(data), sig)
 
-def decrypt_and_verify(ciphertext, recipient_priv, sender_pub):
+def decrypt_and_verify(ciphertext, sig, recipient_priv, sender_pub):
     """Given a message and path to a key, recover the plaintext
     
     returns the message and nonce
     Throws OSNAPSecurityException
     """
+    # Convert the ciphertext back to binary data
+    raw = base64.b64decode(ciphertext)
+    # Check the signature
+    with open(sender_pub,"rb") as keyfile:
+        key = RSA.import_key(keyfile.read())
+    _check_sig(key, raw, sig)
+    
     # Read the asymetric key -- Must be the recipient's private key
     with open(recipient_priv,"rb") as keyfile:
         key = RSA.import_key(keyfile.read())
         cipher_rsa = PKCS1_OAEP.new(key)
     
     # Take apart the message
-    raw = base64.decode(ciphertext)
     eskey = raw[:key.size_in_bytes()] # encrypted symmetric key
     offset = key.size_in_bytes()
     nonce = raw[offset:offset+16] # nonce
@@ -85,7 +91,7 @@ def decrypt_and_verify(ciphertext, recipient_priv, sender_pub):
     # Do the decryption and check the authenticity
     data = cipher_aes.decrypt_and_verify(cipher_text, tag)
     
-    return (data, skey, nonce, tag)
+    return (data.decode("utf-8"), skey, nonce)
     
 def encrypt(plaintext, skey, nonce):
     """Given a known nonce and secret key, encrypt for a recipient"""
@@ -104,7 +110,12 @@ def main():
     skey = get_random_bytes(16)
     nonce = get_random_bytes(16)
     c = encrypt("hi",skey,nonce)
-    print(c)
     p = decrypt(c,skey,nonce)
-    print(p)
+    if p=="hi":
+        print("symmetric encrypt/decrypt working")
+    
+    (data, sig) = encrypt_and_sign('test message', 'lost.pub', 'hr.priv')
+    (data, skey, nonce) = decrypt_and_verify(data, sig, 'lost.priv', 'hr.pub')
+    if data=='test message':
+        print("signed encrypt/decrypt working")
 main()
