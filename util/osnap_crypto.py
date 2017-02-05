@@ -118,4 +118,6 @@ def main():
     (data, skey, nonce) = decrypt_and_verify(data, sig, 'lost.priv', 'hr.pub')
     if data=='test message':
         print("signed encrypt/decrypt working")
-main()
+
+if __name__=="__main__":
+    main()

@@ -1,6 +1,14 @@
 This directory contains some utilities to help interact with the LOST
 application.
 
+To run the osnap_crypto.py file to test functionality, you'll need to generate lost and hr keys. This can be done using osnap-keygen.py
+python3 osnap-keygen.py lost
+python3 osnap-keygen.py hr
+
+Once the keys are generated, running osnap_crypto.py will execute some tests.
+[osnapdev@osnap-image util]$ python3 osnap_crypto.py 
+symmetric encrypt/decrypt working
+signed encrypt/decrypt working
 
 Files:
 osnap-keygen.py - A program to generate key pairs
