@@ -2,16 +2,19 @@
 This section describes the Webservice API used to interact with LOST.
 
 \section*{Overview}
-LOST will provide a RESTful interface for automated interaction with other OSNAP systems. Human resources systems are expected to access and modify LOST user account information. The procurements department will also integrate with LOST to add and change the classification of various products. Only specific application instances should be allowed to use the REST interface to make changes to LOST data.
+LOST will provide a REST-like interface for automated interaction with other OSNAP systems. Human resources systems are expected to access and modify LOST user account information. The procurements department will also integrate with LOST to add and change the classification of various products. Only specific application instances should be allowed to use the REST interface to make changes to LOST data.
 
-A strategy involving public/private cryptography will be used to authenticate interactions via the API. Public and private key files will be configured in the LOST configuration file. Most API calls will take in two arguments:
+A strategy involving RSA public/private cryptography will be used to authenticate interactions via the API. Public and private key files will be configured in the LOST configuration file. All API calls will take in two arguments:
 \begin{enumerate}
 \item A blob containing the needed arguments, encrypted using the LOST public key
 \item A cryptographic signature for the blob, signed using the sender's private key
 \end{enumerate}
 The signature is checked to verify a correct application is the sender. The argument blob is then decrypted. To provide some protection against replay, the request argument blob includes a timestamp. Timestamps will be given in UTC time and requests differing from the current time by more than 5 seconds should cause the API call to fail the request. LOST responses will include the timestamp provided in the request rather than the timestamp of when the response was generated.
 
-The LOST web services will be located under /rest in the LOST URI space. When /rest is queried directly, it should return an HTML document describing the provided REST functions. Each API call expects to be called using the POST method with two named fields; the `arguments' field will contain the request JSON encrypted using the LOST public key and the `signature' field will contain a cryptographic signature of the encrypted message using the requester's private key. The response will be encrypted with the receiver's public key.
+The LOST web services will be located under /rest in the LOST URI space. When /rest is queried directly, it should return an HTML document describing the provided REST functions. Each API call expects to be called using the POST method with two named fields; the `arguments' field will contain the encrypted request JSON and the `signature' field will contain a cryptographic signature of the encrypted message. The cryptographic signature and blob are both binary data. To avoid potential problems with binary data and the HTTP protocol base64 encoding will be used to encode the data for transfer. 
+
+Signatures are generated using the sender's private key (e.i. the requests are signed using the client's private key). Responses from LOST are unsigned. The arguments blob will start with the 16 byte AES key encrypted using the LOST public key, be followed by 16 bytes of nonce and 16 bytes of tag, and then the encrypted request data will follow. LOST will use the key and nonce provided in the request when initializing the AES cipher to encrypt the response. The key and nonce will not be transmitted to the requester; the response will have only 16 bytes of tag followed by the encrypted response. 
+
 
 \section*{API Calls}
 \subsection*{lost\_key}

@@ -11,6 +11,19 @@ def index():
 def welcome():
     return render_template('welcome.html',dbname=dbname,dbhost=dbhost,dbport=dbport)
 
+import json
+@app.route('/rest/suspend_user', methods=('POST',))
+def suspend_user():
+    # request.form is only populated for POST messages
+    if request.method=='POST' and 'arguments' in request.form:
+        req=json.loads(request.form['arguments'])
+
+    dat = dict()
+    dat['timestamp'] = req['timestamp']
+    dat['result'] = 'OK'
+    data = json.dumps(dat)
+    return render_template('api_dat.html',data=data)
+
 @app.route('/goodbye')
 def goodbye():
     if request.method=='GET' and 'mytext' in request.args:
