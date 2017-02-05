@@ -53,7 +53,7 @@ def encrypt_and_sign(plaintext, recipient_pub, sender_priv):
         key = RSA.import_key(keyfile.read())
     sig  = _gen_sig(key, data)
     
-    return (base64.b64encode(data), sig)
+    return (base64.b64encode(data), sig, skey, cipher_aes.nonce)
 
 def decrypt_and_verify(ciphertext, sig, recipient_priv, sender_pub):
     """Given a message and path to a key, recover the plaintext

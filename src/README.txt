@@ -7,6 +7,7 @@ The design currently in this directory, while it works, does not follow best pra
 
 Redirects should be used to point the user to the correct next page after their input data has been processed; in both the success and failure cases.
 
+NOTE :: app.py depends on ../util/osnap_crypto.py being copied into the same directory that app.py is run from. app.py also requires the encryption keys to be set in the configuration file
 
 Files:
 app.py - A Flask app to be run via mod_wsgi

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
-from config import dbname, dbhost, dbport
+from config import dbname, dbhost, dbport, lost_priv, lost_pub, user_pub, prod_pub
+from osnap_crypto import encrypt, decrypt_and_verify
 
 app = Flask(__name__)
 
@@ -14,8 +15,27 @@ def welcome():
 import json
 @app.route('/rest/suspend_user', methods=('POST',))
 def suspend_user():
-    # request.form is only populated for POST messages
-    if request.method=='POST' and 'arguments' in request.form:
+    # Check if the call uses crypto
+    if request.method=='POST' and 'signature' in request.form and \
+            request.form['signature'] != '' and 'arguments' in request.form:
+        # do the crypto, expect that hr is on the other side
+        (data, skey, nonce) = decrypt_and_verify(request.form['arguments'], request.form['signature'], lost_priv, user_pub)
+        
+        # Process the request
+        req=json.loads(data)
+        
+        # Prepare the response data
+        dat = dict()
+        dat['timestamp'] = req['timestamp']
+        dat['result'] = 'OK'
+        data = json.dumps(dat)
+        
+        # Encrypt and send the response
+        data = encrypt(data,skey,nonce)
+        return data
+    
+    # Try to handle as plaintext
+    elif request.method=='POST' and 'arguments' in request.form:
         req=json.loads(request.form['arguments'])
 
     dat = dict()
