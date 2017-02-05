@@ -18,9 +18,20 @@ def main():
     # Prep the arguments blob
     args = dict()
     args['timestamp'] = datetime.datetime.utcnow().isoformat()
-    args['vendor']  = sys.argv[2]
-    args['description'] = sys.argv[3]
-    args['compartments'] = sys.argv[4]
+    if sys.argv[2]=='':
+        args['vendor']=''
+    else:
+        args['vendor']  = sys.argv[2]
+    if sys.argv[3]=='':
+        args['description'] = ''
+    else:
+        args['description'] = sys.argv[3]
+    if sys.argv[4]=='':
+        print("empty list")
+        args['compartments'] = list()
+    else:
+        print("nonempty list --%s--"%sys.argv[4])
+        args['compartments'] = sys.argv[4].split(',')
 
 
     # Print a message to let the user know what is being tried
@@ -31,6 +42,7 @@ def main():
     sargs['arguments']=json.dumps(args)
     sargs['signature']=''
     data = urlencode(sargs)
+    print(sargs)
     
     # Make the resquest
     req = Request(sys.argv[1],data.encode('ascii'),method='POST')
@@ -40,7 +52,8 @@ def main():
     resp = json.loads(res.read().decode('ascii'))
     
     # Print the result code
-    print("Call to LOST returned: %s"%resp['listing'])
+    #print("Call to LOST returned: %s"%resp['listing'])
+    print("Call to LOST returned: %s"%resp)
     
 
 if __name__=='__main__':
