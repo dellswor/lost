@@ -42,7 +42,6 @@ def main():
     sargs['arguments']=json.dumps(args)
     sargs['signature']=''
     data = urlencode(sargs)
-    print(sargs)
     
     # Make the resquest
     req = Request(sys.argv[1],data.encode('ascii'),method='POST')
