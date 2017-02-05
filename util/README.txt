@@ -10,3 +10,4 @@ encrypt.py	- A program to encrypt messages using RSA to protect an AES key
 decrypt.py	- A program to decrypt messages using RSA to protect an AES key
 plain_text_tool.py - A program to communicate with the webservice via plain text
 api_stub.html	- A simple HTML form to allow plaintext to be submitted to the webservice
+osnap_crypto.py - A library to handle the crypto component of HW5

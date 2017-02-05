@@ -8,3 +8,4 @@ sql/ 		- Directory for scripts supporting the database
 src/		- Directory for the application code
 doc/		- Directory for the LaTeX sources to build the documentation
 util/ 		- Directory for some utility programs, like the crypto demos
+clients/	- Directory for web service clients
