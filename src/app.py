@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 from config import dbname, dbhost, dbport, lost_priv, lost_pub, user_pub, prod_pub
-from osnap_crypto import encrypt, decrypt_and_verify
 import json
 import psycopg2
 
@@ -20,17 +19,8 @@ def list_products():
     """This function is huge... much of it should be broken out into other supporting
         functions"""
     
-    encrypted_request = False
-    # Check if the call uses crypto
-    if request.method=='POST' and 'signature' in request.form and \
-            request.form['signature'] != '' and 'arguments' in request.form:
-        
-        encrypted_request = True
-        # do the crypto, expect that inventory is on the other side
-        (data, skey, nonce) = decrypt_and_verify(request.form['arguments'], request.form['signature'], lost_priv, user_pub)
-        req=req=json.loads(data)
     # Check maybe process as plaintext
-    elif request.method=='POST' and 'arguments' in request.form:
+    if request.method=='POST' and 'arguments' in request.form:
         req=json.loads(request.form['arguments'])
     # Unmatched, take the user somewhere else
     else:
@@ -115,36 +105,13 @@ where product_fk is not NULL and c.abbrv||':'||l.abbrv = ANY(%s)"""
     dat['listing'] = listing
     data = json.dumps(dat)
     
-    # Return the data (encrypt or not depending on request
-    if encrypted_request:
-        data = encrypt(data,skey,nonce)
-    
     conn.close()
     return data
     
 @app.route('/rest/suspend_user', methods=('POST',))
 def suspend_user():
-    # Check if the call uses crypto
-    if request.method=='POST' and 'signature' in request.form and \
-            request.form['signature'] != '' and 'arguments' in request.form:
-        # do the crypto, expect that hr is on the other side
-        (data, skey, nonce) = decrypt_and_verify(request.form['arguments'], request.form['signature'], lost_priv, user_pub)
-        
-        # Process the request
-        req=json.loads(data)
-        
-        # Prepare the response data
-        dat = dict()
-        dat['timestamp'] = req['timestamp']
-        dat['result'] = 'OK'
-        data = json.dumps(dat)
-        
-        # Encrypt and send the response
-        data = encrypt(data,skey,nonce)
-        return data
-    
     # Try to handle as plaintext
-    elif request.method=='POST' and 'arguments' in request.form:
+    if request.method=='POST' and 'arguments' in request.form:
         req=json.loads(request.form['arguments'])
 
     dat = dict()
