@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, session, redirect
 from config import dbname, dbhost, dbport
 import psycopg2
 
+from db import html_select_roles
+
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
@@ -46,7 +48,9 @@ def error():
 @app.route('/create_user', methods=('GET','POST'))
 def create_user():
     if request.method=='GET':
-        return render_template('create_user.html')
+        sv = html_select_roles()
+        print(sv)
+        return render_template('create_user.html',role_options=sv)
     if request.method=='POST':
         if 'username' in request.form and 'password' in request.form:
             uname = request.form['username']
