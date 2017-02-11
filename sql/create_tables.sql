@@ -2,6 +2,7 @@
 CREATE TABLE roles (
     role	varchar(32) primary key
 );
+INSERT INTO roles (role) VALUES ('System'); -- System role
 INSERT INTO roles (role) VALUES ('Logistics Officer');
 INSERT INTO roles (role) VALUES ('Facilities Officer');
 
@@ -13,6 +14,7 @@ CREATE TABLE users (
     create_dt   timestamp,          -- Will be used to age out accounts
     role        varchar(32) REFERENCES roles(role) not null -- setup role
 );
+INSERT INTO users (username,password,create_dt,role) VALUES ('system',NULL,now(),'System'); -- System user, can't login due to NULL password
 
 CREATE TABLE facilities (
     facility_pk	     serial primary key, -- habit

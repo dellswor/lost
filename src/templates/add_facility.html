@@ -1,0 +1,21 @@
+<HTML>
+	<HEAD><TITLE>LOST Add Facility</TITLE></HEAD>
+    <BODY>
+        <H1>Existing Facilities</H1>
+        <TABLE>
+            <TR><TH>fcode</TH><TH>Comman Name</TH><TH>Create Time</TH><TH>Creating User</TH><TR>
+            {% for r in flist: %}
+                <TR><TD>{{r['fcode']}}</TD><TD>{{r['cname']}}</TD><TD>{{r['cdate']}}</TD><TD>{{r['uname']}}</TD></TR>
+            {% endfor %}
+        </TABLE>
+        
+        <H1>Create LOST Facility</H1>
+		<FORM action="{{url_for('add_facility')}}" method="POST">
+			<TABLE>
+				<TR><TD>fcode:</TD><TD><INPUT TYPE="TEXT" NAME="fcode"/></TD></TR>
+				<TR><TD>Common Name:</TD><TD><INPUT TYPE="TEXT" NAME="cname"/></TD></TR>
+			</TABLE>
+			<INPUT TYPE="SUBMIT" />
+		</FORM>
+	</BODY>
+</HTML>
