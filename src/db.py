@@ -13,6 +13,18 @@ def html_select_roles():
             role_options.append('<OPTION VALUE="%s">%s</OPTION>'%(r[0],r[0]))
         return ''.join(role_options)
 
+def html_select_fcodes():
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT fcode,common_name FROM facilities ORDER by common_name"
+        cur.execute(sql)
+        conn.commit()
+        res = cur.fetchall()
+        fcode_options = list()
+        for r in res:
+            fcode_options.append('<OPTION VALUE="%s">%s</OPTION>'%(r[0],r[1]))
+        return ''.join(fcode_options)
+
 def fetch_facilities():
     with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
         cur = conn.cursor()
@@ -67,7 +79,7 @@ def put_facility(fcode,cname,uname):
         conn.commit()
     return None
 
-def put_asset(atag,desc,uname):
+def put_asset(atag,desc,fcode,uname):
     with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
         cur = conn.cursor()
         sql = "SELECT count(*) FROM users WHERE username=%s"
@@ -82,7 +94,10 @@ def put_asset(atag,desc,uname):
         if res != 0:
             # fail due to duplicate
             return "Duplicate asset. Addition rejected"
-        sql = "INSERT INTO assets (asset_tag,description,create_dt,create_user) SELECT %s,%s,now(),user_pk FROM users WHERE username=%s"
+        sql = "INSERT INTO assets (asset_tag,description,create_dt,create_user) SELECT %s,%s,now(),user_pk FROM users WHERE username=%s RETURNING asset_pk"
         cur.execute(sql,(atag,desc,uname))
+        a_pk = cur.fetchone()[0]
+        sql = "INSERT INTO asset_at (asset_fk,facility_fk,arrive_dt) SELECT %s,facility_pk,now() FROM facilities WHERE fcode=%s"
+        cur.execute(sql,(a_pk,fcode))
         conn.commit()
     return None

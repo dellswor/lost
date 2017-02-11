@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect
 from config import dbname, dbhost, dbport
 import psycopg2
 
-from db import html_select_roles, fetch_facilities, put_facility, fetch_assets, put_asset
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -60,7 +60,8 @@ def add_facility():
 def add_asset():
     if request.method=='GET':
         alist = fetch_assets()
-        return render_template('add_asset.html',alist=alist)
+        fv = html_select_fcodes()
+        return render_template('add_asset.html',alist=alist,fcode_options=fv)
     if request.method=='POST':
         # Want the user name for my accounting (not part of reqs)
         if not 'username' in session:
@@ -70,7 +71,8 @@ def add_asset():
         # Read the form data
         atag = request.form['atag']
         desc = request.form['desc']
-        res = put_asset(atag,desc,uname)
+        fcode = request.form['fcode']
+        res = put_asset(atag,desc,fcode,uname)
         if res is not None:
             if res == 'Illegal user adding asset':
                 del session['username']
