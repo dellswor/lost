@@ -1,0 +1,13 @@
+<HTML>
+	<HEAD><TITLE>LOST Dispose Asset</TITLE></HEAD>
+    <BODY>
+        <H1>Dispose LOST Asset</H1>
+		<FORM action="{{url_for('dispose_asset')}}" method="POST">
+			<TABLE>
+				<TR><TD>Asset Tag:</TD><TD><INPUT TYPE="TEXT" NAME="atag"/></TD></TR>
+				<TR><TD>Disposal Date:</TD><TD><INPUT TYPE="TEXT" NAME="date" VALUE="YYYY/MM/DD HH:MM:SS"/></TD></TR>
+			</TABLE>
+			<INPUT TYPE="SUBMIT" />
+		</FORM>
+	</BODY>
+</HTML>

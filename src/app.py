@@ -2,11 +2,18 @@ from flask import Flask, render_template, request, session, redirect
 from config import dbname, dbhost, dbport
 import psycopg2
 
-from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
+def user_is(role):
+    if not 'username' in session:
+        return False
+    if role == user_role(session['username']):
+        return True
+    return False
+    
 @app.route('/')
 @app.route('/login',methods=('GET','POST'))
 def login():
@@ -79,6 +86,23 @@ def add_asset():
             session['error']=res
             return redirect('error')
         return redirect('add_asset')
+
+@app.route('/dispose_asset',methods=('GET','POST'))
+def dispose_asset():
+    # Access control
+    if not user_is('Logistics Officer'):
+        session['error']='Only Logistics Officer may dispose assets'
+        return redirect('error')
+    if request.method=='GET':
+        return render_template('dispose_asset.html')
+    if request.method=='POST':
+        atag = request.form['atag']
+        date = request.form['date']
+        res = del_asset(atag,date)
+        if res is not None:
+            session['error']=res
+            return redirect('error')
+        return redirect('dashboard')
         
 @app.route('/dashboard',methods=('GET',))
 def dashboard():

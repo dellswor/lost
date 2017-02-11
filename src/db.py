@@ -101,3 +101,32 @@ def put_asset(atag,desc,fcode,uname):
         cur.execute(sql,(a_pk,fcode))
         conn.commit()
     return None
+
+def del_asset(atag, date):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        # check the tag
+        sql = "SELECT count(*) FROM assets WHERE asset_tag=%s"
+        cur.execute(sql,(atag,))
+        res = cur.fetchone()[0]
+        if res != 1:
+            return 'Asset tag %s not found'%atag
+        # check if it was already disposed
+        sql = 'SELECT count(*) FROM asset_at aa JOIN assets a ON a.asset_pk=aa.asset_fk WHERE a.asset_tag=%s AND disposed_dt IS NOT NULL'
+        cur.execute(sql,(atag,))
+        res = cur.fetchone()[0]
+        if res > 0:
+            return 'Asset tag %s already disposed'%atag
+        # dispose the asset
+        sql = "UPDATE asset_at SET disposed_dt=%s WHERE asset_fk=%s AND depart_dt IS NULL AND disposed_dt IS NULL"
+        cur.execute(sql,(date,a_pk))
+        cur.commit()
+        return None
+        
+def user_role(uname):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT role FROM users WHERE username=%s"
+        cur.execute(sql,(uname,))
+        conn.commit()
+        return cur.fetchone()[0]
