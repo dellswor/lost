@@ -15,6 +15,8 @@ CREATE TABLE users (
     role        varchar(32) REFERENCES roles(role) not null -- setup role
 );
 INSERT INTO users (username,password,create_dt,role) VALUES ('system',NULL,now(),'System'); -- System user, can't login due to NULL password
+INSERT INTO users (username,password,create_dt,role) VALUES ('log','l',now(),'Logistics Officer'); -- testing
+INSERT INTO users (username,password,create_dt,role) VALUES ('fac','f',now(),'Facilities Officer'); -- testing
 
 CREATE TABLE facilities (
     facility_pk	     serial primary key, -- habit

@@ -118,9 +118,9 @@ def del_asset(atag, date):
         if res > 0:
             return 'Asset tag %s already disposed'%atag
         # dispose the asset
-        sql = "UPDATE asset_at SET disposed_dt=%s WHERE asset_fk=%s AND depart_dt IS NULL AND disposed_dt IS NULL"
-        cur.execute(sql,(date,a_pk))
-        cur.commit()
+        sql = "UPDATE asset_at SET disposed_dt=%s FROM assets WHERE asset_fk=asset_pk AND asset_tag=%s AND depart_dt IS NULL AND disposed_dt IS NULL"
+        cur.execute(sql,(date,atag))
+        conn.commit()
         return None
         
 def user_role(uname):

@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect
 from config import dbname, dbhost, dbport
 import psycopg2
 
-from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -128,11 +128,7 @@ def create_user():
             urole = request.form['role']
             with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
                 cur = conn.cursor()
-                # Clean up the aged out records
-                sql = "delete from users where create_dt < now() - interval '60 minutes';"
-                cur.execute(sql)
-                conn.commit()
-                # Check if the user exists
+                # Check if the user exist
                 sql = "select count(*) from users where username=%s"
                 cur.execute(sql,(uname,))
                 res = cur.fetchone()[0]
