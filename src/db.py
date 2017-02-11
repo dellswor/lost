@@ -30,6 +30,23 @@ def fetch_facilities():
             facilities.append(d)
         return facilities
 
+def fetch_assets():
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT asset_tag,description,a.create_dt,username FROM assets a JOIN users u ON u.user_pk=a.create_user ORDER BY asset_tag"
+        cur.execute(sql)
+        conn.commit()
+        res = cur.fetchall()
+        facilities = list()
+        for r in res:
+            d = dict()
+            d['atag'] = r[0]
+            d['desc'] = r[1]
+            d['date'] = r[2]
+            d['name'] = r[3]
+            facilities.append(d)
+        return facilities
+
 def put_facility(fcode,cname,uname):
     with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
         cur = conn.cursor()
@@ -47,5 +64,25 @@ def put_facility(fcode,cname,uname):
             return "Duplicate asset. Addition rejected"
         sql = "INSERT INTO facilities (common_name,fcode,create_dt,create_user) SELECT %s,%s,now(),user_pk FROM users WHERE username=%s"
         cur.execute(sql,(cname,fcode,uname))
+        conn.commit()
+    return None
+
+def put_asset(atag,desc,uname):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT count(*) FROM users WHERE username=%s"
+        cur.execute(sql,(uname,))
+        res = cur.fetchone()[0]
+        if res != 1:
+            # fail due to bad username
+            return "Illegal user adding asset"
+        sql = "SELECT count(*) FROM assets WHERE asset_tag=%s"
+        cur.execute(sql,(atag,))
+        res = cur.fetchone()[0]
+        if res != 0:
+            # fail due to duplicate
+            return "Duplicate asset. Addition rejected"
+        sql = "INSERT INTO assets (asset_tag,description,create_dt,create_user) SELECT %s,%s,now(),user_pk FROM users WHERE username=%s"
+        cur.execute(sql,(atag,desc,uname))
         conn.commit()
     return None

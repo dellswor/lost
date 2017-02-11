@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect
 from config import dbname, dbhost, dbport
 import psycopg2
 
-from db import html_select_roles, fetch_facilities, put_facility
+from db import html_select_roles, fetch_facilities, put_facility, fetch_assets, put_asset
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -56,6 +56,28 @@ def add_facility():
             return redirect('error')
         return redirect('add_facility')
 
+@app.route('/add_asset',methods=('GET','POST'))
+def add_asset():
+    if request.method=='GET':
+        alist = fetch_assets()
+        return render_template('add_asset.html',alist=alist)
+    if request.method=='POST':
+        # Want the user name for my accounting (not part of reqs)
+        if not 'username' in session:
+            uname = 'system'
+        else:
+            uname = session['username']
+        # Read the form data
+        atag = request.form['atag']
+        desc = request.form['desc']
+        res = put_asset(atag,desc,uname)
+        if res is not None:
+            if res == 'Illegal user adding asset':
+                del session['username']
+            session['error']=res
+            return redirect('error')
+        return redirect('add_asset')
+        
 @app.route('/dashboard',methods=('GET',))
 def dashboard():
     return render_template('dashboard.html',username=session['username'])

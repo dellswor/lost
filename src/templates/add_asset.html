@@ -1,0 +1,21 @@
+<HTML>
+	<HEAD><TITLE>LOST Add Asset</TITLE></HEAD>
+    <BODY>
+        <H1>Existing Assets</H1>
+        <TABLE>
+            <TR><TH>Asset Tag</TH><TH>Description</TH><TH>Create Time</TH><TH>Creating User</TH><TR>
+            {% for r in alist: %}
+                <TR><TD>{{r['atag']}}</TD><TD>{{r['desc']}}</TD><TD>{{r['date']}}</TD><TD>{{r['name']}}</TD></TR>
+            {% endfor %}
+        </TABLE>
+        
+        <H1>Create LOST Asset</H1>
+		<FORM action="{{url_for('add_asset')}}" method="POST">
+			<TABLE>
+				<TR><TD>Asset Tag:</TD><TD><INPUT TYPE="TEXT" NAME="atag"/></TD></TR>
+				<TR><TD>Common Name:</TD><TD><TEXTAREA NAME="desc">OSNAP Asset</TEXTAREA></TD></TR>
+			</TABLE>
+			<INPUT TYPE="SUBMIT" />
+		</FORM>
+	</BODY>
+</HTML>
