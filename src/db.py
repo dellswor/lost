@@ -13,7 +13,7 @@ def html_select_roles():
             role_options.append('<OPTION VALUE="%s">%s</OPTION>'%(r[0],r[0]))
         return ''.join(role_options)
 
-def html_select_fcodes():
+def html_select_fcodes(selected=''):
     with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
         cur = conn.cursor()
         sql = "SELECT fcode,common_name FROM facilities ORDER by common_name"
@@ -22,7 +22,10 @@ def html_select_fcodes():
         res = cur.fetchall()
         fcode_options = list()
         for r in res:
-            fcode_options.append('<OPTION VALUE="%s">%s</OPTION>'%(r[0],r[1]))
+            if r[0]==selected:
+                fcode_options.append('<OPTION VALUE="%s" SELECTED>%s</OPTION>'%(r[0],r[1]))
+            else:
+                fcode_options.append('<OPTION VALUE="%s">%s</OPTION>'%(r[0],r[1]))
         return ''.join(fcode_options)
 
 def fetch_facilities():

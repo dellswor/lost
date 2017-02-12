@@ -1,0 +1,22 @@
+<HTML>
+	<HEAD><TITLE>LOST Asset Report</TITLE></HEAD>
+    <BODY>
+        <H1>Asset Report</H1>
+        <H1>Filter Criteria</H1>
+		<FORM action="{{url_for('asset_report')}}" method="POST">
+			<TABLE>
+				<TR><TD>Facility:</TD><TD><SELECT NAME="fcode"><OPTION VALUE="">All Facilities</OPTION>{{fcode_options|safe}}</SELECT></TD></TR>
+				<TR><TD>Date:</TD><TD><INPUT TYPE="TEXT" NAME="date" value="{{fvals['rdate']}}"/></TD></TR>
+			</TABLE>
+			<INPUT TYPE="SUBMIT" />
+		</FORM>
+        
+        <H1>Asset Report</H1>
+        <TABLE>
+            <TR><TH>Asset Tag</TH><TH>Description</TH><TH>fcode</TH><TH>Common Name</TH><TH>Arrive</TH><TH>Depart</TH><TR>
+            {% for r in data: %}
+                <TR><TD>{{r['atag']}}</TD><TD>{{r['desc']}}</TD><TD>{{r['fcode']}}</TD><TD>{{r['cname']}}</TD><TD>{{r['adate']}}</TD><TD>{{r['ddate']}}</TD></TR>
+            {% endfor %}
+        </TABLE>
+    </BODY>
+</HTML>

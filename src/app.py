@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, redirect
 from config import dbname, dbhost, dbport
 import psycopg2
+import datetime
 
 from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset
 
@@ -103,6 +104,60 @@ def dispose_asset():
             session['error']=res
             return redirect('error')
         return redirect('dashboard')
+
+@app.route('/asset_report',methods=('GET','POST'))
+def asset_report():
+    form_fields=dict()
+    data = list()
+    if request.method=='GET':
+        # Set form defaults
+        form_fields['fcode']=''
+        form_fields['rdate']=datetime.datetime.utcnow().isoformat()
+    if request.method=='POST':
+        # Read last values
+        if 'fcode' in request.form and 'date' in request.form:
+            form_fields['fcode']=request.form['fcode']
+            form_fields['rdate']=request.form['date']
+        else:
+            form_fields['fcode']=None
+            form_fields['rdate']=datetime.datetime.utcnow().isoformat()
+        # Run query
+        with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+            cur = conn.cursor()
+            sql = '''SELECT asset_tag,description,common_name,arrive_dt,depart_dt,disposed_dt,fcode
+            FROM asset_at aa
+            JOIN facilities f ON aa.facility_fk=f.facility_pk
+            JOIN assets a ON a.asset_pk=aa.asset_fk
+            WHERE (arrive_dt is null or arrive_dt<=%s) and
+                  (depart_dt is null or depart_dt>=%s) and
+                  (disposed_dt is null or disposed_dt>=%s)'''
+            if form_fields['fcode']=='':
+                sql += " order by asset_tag asc"
+                cur.execute(sql,(form_fields['rdate'],form_fields['rdate'],form_fields['rdate']))
+            else:
+                sql += " and f.fcode=%s order by asset_tag asc"
+                cur.execute(sql,(form_fields['rdate'],form_fields['rdate'],form_fields['rdate'],form_fields['fcode']))
+            res = cur.fetchall()
+            conn.commit()
+            for r in res:
+                e = dict()
+                e['atag']=r[0]
+                e['desc']=r[1]
+                e['cname']=r[2]
+                if r[3] is None:
+                    e['adate']=''
+                else:
+                    e['adate']=r[3]
+                if r[4] is None and r[5] is None:
+                    e['ddate']=''
+                elif r[4]:
+                    e['ddate']=r[4]
+                else:
+                    e['ddate']=r[5]
+                e['fcode']=r[6]
+                data.append(e)
+    fv = html_select_fcodes(selected=form_fields['fcode'])
+    return render_template('asset_report.html',fvals=form_fields,fcode_options=fv,data=data)
         
 @app.route('/dashboard',methods=('GET',))
 def dashboard():
