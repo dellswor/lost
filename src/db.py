@@ -133,3 +133,15 @@ def user_role(uname):
         cur.execute(sql,(uname,))
         conn.commit()
         return cur.fetchone()[0]
+
+def fetch_userinfo(uname):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT username,role,active FROM users WHERE username=%s"
+        cur.execute(sql,(uname,))
+        conn.commit()
+        res = cur.fetchone()
+        if res is None:
+            return (None, None, None)
+        else:
+            return (res[0],res[1],res[2])

@@ -3,11 +3,23 @@ from config import dbname, dbhost, dbport
 import psycopg2
 import datetime
 
-from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
+def check_login():
+    # Is there a username in the session
+    if not 'username' in session:
+        return False
+    # Get the user information
+    (uname, urole, uactv) = fetch_userinfo(session['username'])
+    if uactv is None:
+        return False
+    session['username']=uname
+    session['role']=urole
+    return True
+    
 def user_is(role):
     if not 'username' in session:
         return False
@@ -159,8 +171,18 @@ def asset_report():
     fv = html_select_fcodes(selected=form_fields['fcode'])
     return render_template('asset_report.html',fvals=form_fields,fcode_options=fv,data=data)
         
+@app.route('/transfer_report',methods=('GET','POST'))
+def transfer_report():
+    pass
+
+@app.route('/request_transfer',methods=('GET','POST'))
+def req_transfer():
+    pass
+    
 @app.route('/dashboard',methods=('GET',))
 def dashboard():
+    if not check_login():
+        return redirect('login')
     return render_template('dashboard.html',username=session['username'])
 
 @app.route('/error',methods=('GET',))

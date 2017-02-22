@@ -3,5 +3,23 @@
 	<BODY>
 		<H1>LOST Dashboard</H1>
 		<p>Welcome {{username}}!</p>
+		<h2>Actions</h2>
+		<table>
+		    <tr><td><a href="{{url_for('asset_report')}}">Asset Report</a></td><td>Report of assets by facility</td></tr>
+		    <tr><td><a href="{{url_for('transfer_report')}}">Transfer Report</a></td><td>Report of assets in transit</td></tr>
+		    <tr><td><a href="{{url_for('add_asset')}}">Add Asset</a></td><td>Add an asset to LOST</td></tr>
+		    <tr><td><a href="{{url_for('add_facility')}}">Add Facility</a></td><td>Add a facility to LOST</td></tr>
+		    {% if session['role']=='Logistics Officer' %}
+		    <tr><td><a href="{{url_for('dispose_asset')}}">Dispose Asset</a></td><td>Mark LOST asset disposed</td></tr>
+		    <tr><td><a href="{{url_for('req_transfer')}}">Request Transfer</a></td><td>Request an asset be transferred</td></tr>
+		    {% endif %}
+		
+		{% if session['role']=='Logistics Officer' %}
+		<h2>Asset Transits to Process</h2>
+		{% endif %}
+		
+		{% if session['role']=='Facilities Officer' %}
+		<h2>Asset Transits to Approve</h2>
+		{% endif %}
 	</BODY>
 </HTML>

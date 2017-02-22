@@ -12,11 +12,12 @@ CREATE TABLE users (
     username    varchar(16) unique,        -- 16 chars from spec
     password    varchar(16),        -- Think this will be long enough for hash
     create_dt   timestamp,          -- Will be used to age out accounts
-    role        varchar(32) REFERENCES roles(role) not null -- setup role
+    role        varchar(32) REFERENCES roles(role) not null, -- setup role
+    active      boolean -- added after looking ahead to assignment 10
 );
-INSERT INTO users (username,password,create_dt,role) VALUES ('system',NULL,now(),'System'); -- System user, can't login due to NULL password
-INSERT INTO users (username,password,create_dt,role) VALUES ('log','l',now(),'Logistics Officer'); -- testing
-INSERT INTO users (username,password,create_dt,role) VALUES ('fac','f',now(),'Facilities Officer'); -- testing
+INSERT INTO users (username,password,create_dt,role,active) VALUES ('system',NULL,now(),'System',False); -- System user, can't login due to NULL password
+INSERT INTO users (username,password,create_dt,role,active) VALUES ('log','l',now(),'Logistics Officer',True); -- testing
+INSERT INTO users (username,password,create_dt,role,active) VALUES ('fac','f',now(),'Facilities Officer',True); -- testing
 
 CREATE TABLE facilities (
     facility_pk	     serial primary key, -- habit
