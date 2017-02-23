@@ -3,7 +3,7 @@ from config import dbname, dbhost, dbport
 import psycopg2
 import datetime
 
-from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo, valid_fcode, valid_atag, put_transit_req
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -236,10 +236,10 @@ def transfer_req():
         return render_template('init_transfer.html',fcode_options=fv)
     if request.method=='POST':
         # Parse the input
-        if 'src_fcode' in session and 'dst_fcode' in session and 'a_tag' in session:
-            src_fcode=session['src_fcode']
-            dst_fcode=session['dst_fcode']
-            a_tag    =session['a_tag']
+        if 'src_fcode' in request.form and 'dst_fcode' in request.form and 'a_tag' in request.form:
+            src_fcode=request.form['src_fcode']
+            dst_fcode=request.form['dst_fcode']
+            a_tag    =request.form['a_tag']
         else:
             session['error']="Bad form inputs"
             return redirect('error')
@@ -256,7 +256,7 @@ def transfer_req():
             return redirect('error')
             
         # Add the transit request
-        is_ok = put_transit_req(a_tag,src_fcode,dst_fcode)
+        is_ok = put_transit_req(session['username'],a_tag,src_fcode,dst_fcode)
         if is_ok:
             session['error']="Transit request created successfully"
         else:

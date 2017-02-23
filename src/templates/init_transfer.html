@@ -1,0 +1,15 @@
+<HTML>
+	<HEAD><TITLE>Initiate Transfer</TITLE></HEAD>
+    <BODY>
+        <H1>Initiate Transfer</H1>
+        
+        <FORM action="{{url_for('transfer_req')}}" method="POST">
+            <TABLE>
+                <TR><TD>Source Facility:</TD><TD><SELECT name="src_fcode">{{fcode_options|safe}}</SELECT></TD></TR>
+                <TR><TD>Destination Facility:</TD><TD><SELECT name="dst_fcode">{{fcode_options|safe}}</SELECT></TD></TR>
+                <TR><TD>Asset Tag:</TD><TD><INPUT NAME="a_tag" /></TD></TR>
+            </TABLE>
+            <INPUT TYPE="SUBMIT" />
+        </FORM>
+    </BODY>
+</HTML>

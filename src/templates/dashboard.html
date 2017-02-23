@@ -11,7 +11,7 @@
 		    <tr><td><a href="{{url_for('add_facility')}}">Add Facility</a></td><td>Add a facility to LOST</td></tr>
 		    {% if session['role']=='Logistics Officer' %}
 		    <tr><td><a href="{{url_for('dispose_asset')}}">Dispose Asset</a></td><td>Mark LOST asset disposed</td></tr>
-		    <tr><td><a href="{{url_for('req_transfer')}}">Request Transfer</a></td><td>Request an asset be transferred</td></tr>
+		    <tr><td><a href="{{url_for('transfer_req')}}">Request Transfer</a></td><td>Request an asset be transferred</td></tr>
 		    {% endif %}
 		
 		{% if session['role']=='Logistics Officer' %}

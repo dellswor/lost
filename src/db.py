@@ -145,3 +145,33 @@ def fetch_userinfo(uname):
             return (None, None, None)
         else:
             return (res[0],res[1],res[2])
+
+def valid_fcode(fcode):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT count(*) FROM facilities WHERE fcode=%s"
+        cur.execute(sql,(fcode,))
+        res = cur.fetchone()[0]
+        if res==1:
+            return True
+        return False
+
+def valid_atag(atag):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT count(*) FROM assets WHERE asset_tag=%s"
+        cur.execute(sql,(atag,))
+        res = cur.fetchone()[0]
+        if res==1:
+            return True
+        return False
+
+def put_transit_req(uname,a_tag,src_fcode,dst_fcode):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "INSERT INTO transfer_req (requested_by,create_dt,asset_fk,src_fk,dst_fk) SELECT user_pk,now(),asset_pk,s.facility_pk,d.facility_pk FROM users u, assets a, facilities s, facilities d WHERE username=%s AND asset_tag=%s AND s.fcode=%s AND d.fcode=%s"
+        cur.execute(sql,(uname,a_tag,src_fcode,dst_fcode))
+        conn.commit()
+        if not cur.rowcount==1:
+            return None
+        return True
