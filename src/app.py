@@ -224,6 +224,45 @@ def create_user():
     session['error'] = 'Invalid HTTP method %s'%request.method
     return redirect('error')
 
+@app.route('/transfer_req', methods=('GET','POST'))
+def transfer_req():
+    if not check_login():
+        return redirect('login')
+    if not session['role']=='Logistics Officer':
+        session['error']='Only a Logistics Officer may initiate a transfer request'
+        return redirect('error')
+    if request.method=='GET':
+        fv = html_select_fcodes()
+        return render_template('init_transfer.html',fcode_options=fv)
+    if request.method=='POST':
+        # Parse the input
+        if 'src_fcode' in session and 'dst_fcode' in session and 'a_tag' in session:
+            src_fcode=session['src_fcode']
+            dst_fcode=session['dst_fcode']
+            a_tag    =session['a_tag']
+        else:
+            session['error']="Bad form inputs"
+            return redirect('error')
+            
+        # Validate input
+        if not valid_fcode(src_fcode):
+            session['error']="Bad source"
+            return redirect('error')
+        if not valid_fcode(dst_fcode):
+            session['error']="Bad destination"
+            return redirect('error')
+        if not valid_atag(a_tag):
+            session['error']="Bad asset tag"
+            return redirect('error')
+            
+        # Add the transit request
+        is_ok = put_transit_req(a_tag,src_fcode,dst_fcode)
+        if is_ok:
+            session['error']="Transit request created successfully"
+        else:
+            session['error']="An error occurred trying to make the request"
+        return redirect('error')
+
 if __name__=='__main__':
     app.debug = True
     app.run(port=8080, host='0.0.0.0')
