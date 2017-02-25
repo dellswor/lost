@@ -176,6 +176,34 @@ def put_transit_req(uname,a_tag,src_fcode,dst_fcode):
             return None
         return True
 
+def fetch_transit_req(tr_pk):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT transfer_req, asset_tag, s.fcode, d.fcode FROM transfer_req r JOIN assets a ON a.asset_pk=r.asset_fk JOIN facilities s ON s.facility_pk=r.src_fk JOIN facilities d ON d.facility_pk=r.dst_fk WHERE is_approved is NULL and transfer_req=%s"
+        cur.execute(sql,(tr_pk,))
+        conn.commit()
+        res=cur.fetchone()
+        ret=dict()
+        ret['id']=res[0]
+        ret['tag']=res[1]
+        ret['src']=res[2]
+        ret['dst']=res[3]
+        return ret
+
+def mark_approved(uname,tr_pk):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "UPDATE transfer_req SET (approved_by,approve_dt,is_approved)=(user_pk,now(),True) FROM users WHERE username=%s AND transfer_req=%s"
+        cur.execute(sql,(uname,tr_pk))
+        conn.commit()
+
+def mark_rejected(uname,tr_pk):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "UPDATE transfer_req SET (approved_by,approve_dt,is_approved)=(user_pk,now(),False) FROM users WHERE username=%s AND transfer_req=%s"
+        cur.execute(sql,(uname,tr_pk))
+        conn.commit()
+        
 def fetch_need_approval():
     with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
         cur = conn.cursor()

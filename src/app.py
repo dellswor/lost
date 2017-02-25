@@ -3,7 +3,7 @@ from config import dbname, dbhost, dbport
 import psycopg2
 import datetime
 
-from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo, valid_fcode, valid_atag, put_transit_req, fetch_need_approval
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo, valid_fcode, valid_atag, put_transit_req, fetch_need_approval, fetch_transit_req, mark_approved, mark_rejected
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -267,21 +267,39 @@ def transfer_req():
             session['error']="An error occurred trying to make the request"
         return redirect('error')
 
-@app.route('/approve_req', methods=('POST',))
+@app.route('/approve_req', methods=('GET','POST'))
 def approve_req():
-    print("In approve_req")
     if not check_login():
         return redirect('login')
     if not session['role']=='Facilities Officer':
         session['error']='Only a Facilities Officer may approve/reject a transfer request'
         return redirect('error')
-    for k in request.form.keys():
-        print("%s => %s"%(k,request.form[k]))
-    approve = request.form['approve']
-    reject  = request.form['reject']
-    print(approve)
-    print(reject)
-    return redirect('dashboard')
+    if request.method=='GET':
+        print(request.args)
+        if not 'id' in request.args:
+            print("no id")
+            session['error']='Invalid Request'
+            return redirect('error')
+        else:
+            transit_pk=int(request.args['id'])
+            try:
+                data = fetch_transit_req(transit_pk)
+            except:
+                print("db error")
+                session['error']='Invalid Request'
+                return redirect('error')
+            return render_template('approve_req.html',data=data)
+    if request.method=='POST':
+        if not 'id' in request.form or not 'submit' in request.form:
+            session['error']='Invalid Request'
+            return redirect('error')
+        if request.form['submit']=='cancel':
+            pass
+        if request.form['submit']=='approve':
+            mark_approved(session['username'],int(request.form['id']))
+        if request.form['submit']=='reject':
+            mark_rejected(session['username'],int(request.form['id']))
+        return redirect('dashboard')
 
 if __name__=='__main__':
     app.debug = True
