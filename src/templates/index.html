@@ -1,4 +1,12 @@
 <html>
 	<head><title>Connected</title></head>
-	<body><h1>Connected to LOST wsgi</h1></body>
+	<body><h1>Connected to demo</h1>
+	
+	<table>
+		{% for r in data %}
+		<tr><td><a href="{{url_for('test')}}?id={{r['id']}}">{{r['name']}}</a></td></tr>
+		{% endfor %}
+	</table>
+	
+	</body>
 </html>
