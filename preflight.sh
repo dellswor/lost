@@ -13,7 +13,7 @@ fi
 
 # Database prep
 cd sql
-psql $1 -f create_tables.sql
+#psql $1 -f create_tables.sql
 cd ..
 
 # Install the wsgi files

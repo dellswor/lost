@@ -175,3 +175,21 @@ def put_transit_req(uname,a_tag,src_fcode,dst_fcode):
         if not cur.rowcount==1:
             return None
         return True
+
+def fetch_need_approval():
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT transfer_req,t.create_dt,asset_tag,s.fcode,d.fcode FROM transfer_req t JOIN assets a ON a.asset_pk=t.asset_fk JOIN facilities s ON t.src_fk=s.facility_pk JOIN facilities d ON t.dst_fk=d.facility_pk WHERE is_approved IS NULL ORDER BY t.create_dt asc"
+        cur.execute(sql)
+        conn.commit()
+        res = cur.fetchall()
+        ret = list()
+        for r in res:
+            e = dict()
+            e['id'] = r[0]
+            e['date'] = r[1]
+            e['tag'] = r[2]
+            e['src'] = r[3]
+            e['dst'] = r[4]
+            ret.append(e)
+        return ret

@@ -3,7 +3,7 @@ from config import dbname, dbhost, dbport
 import psycopg2
 import datetime
 
-from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo, valid_fcode, valid_atag, put_transit_req
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo, valid_fcode, valid_atag, put_transit_req, fetch_need_approval
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -183,7 +183,11 @@ def req_transfer():
 def dashboard():
     if not check_login():
         return redirect('login')
-    return render_template('dashboard.html',username=session['username'])
+    to_approve = None
+    to_load    = None
+    if session['role']=='Facilities Officer':
+        to_approve = fetch_need_approval()
+    return render_template('dashboard.html',username=session['username'],to_approve=to_approve,to_load=to_load)
 
 @app.route('/error',methods=('GET',))
 def error():
@@ -262,6 +266,22 @@ def transfer_req():
         else:
             session['error']="An error occurred trying to make the request"
         return redirect('error')
+
+@app.route('/approve_req', methods=('POST',))
+def approve_req():
+    print("In approve_req")
+    if not check_login():
+        return redirect('login')
+    if not session['role']=='Facilities Officer':
+        session['error']='Only a Facilities Officer may approve/reject a transfer request'
+        return redirect('error')
+    for k in request.form.keys():
+        print("%s => %s"%(k,request.form[k]))
+    approve = request.form['approve']
+    reject  = request.form['reject']
+    print(approve)
+    print(reject)
+    return redirect('dashboard')
 
 if __name__=='__main__':
     app.debug = True

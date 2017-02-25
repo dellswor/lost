@@ -13,6 +13,7 @@
 		    <tr><td><a href="{{url_for('dispose_asset')}}">Dispose Asset</a></td><td>Mark LOST asset disposed</td></tr>
 		    <tr><td><a href="{{url_for('transfer_req')}}">Request Transfer</a></td><td>Request an asset be transferred</td></tr>
 		    {% endif %}
+		</table>
 		
 		{% if session['role']=='Logistics Officer' %}
 		<h2>Asset Transits to Process</h2>
@@ -20,6 +21,15 @@
 		
 		{% if session['role']=='Facilities Officer' %}
 		<h2>Asset Transits to Approve</h2>
+		<form action="{{url_for('approve_req')}}" method='POST'>
+		<table>
+		    <tr><th>Approve</th><th>Reject</th><th>Date</th><th>Req #</th><th>Asset Tag</th><th>From</th><th>To</th></tr>
+		{% for r in to_approve: %}
+		    <tr><td><input type="checkbox" name="approve" /></td><td><input type="checkbox" name="reject" /></td><td>{{r['date']}}</td><td>{{r['id']}}</td><td>{{r['tag']}}</td><td>{{r['src']}}</td><td>{{r['dst']}}</td></tr>
+		{% endfor %}
+		</table>
+		<input type="submit"/>
+		</form>
 		{% endif %}
 	</BODY>
 </HTML>
