@@ -1,0 +1,19 @@
+<HTML>
+	<HEAD><TITLE>LOST Update Transfer</TITLE></HEAD>
+	<BODY>
+	    <FORM action="{{url_for('update_transit')}}" method="POST">
+	    <TABLE>
+	        <H1>Update For</H2>
+	        <TR><TD>Transfer ID</TD><TD>{{data['id']}}</TD></TR>
+	        <TR><TD>Asset Tag</TD><TD>{{data['tag']}}</TD></TR>
+	        <TR><TD>Source</TD><TD>{{data['src']}}</TD></TR>
+	        <TR><TD>Destination</TD><TD>{{data['dst']}}</TD></TR>
+	        <TR><TD>Load Date</TD><TD><INPUT TYPE='TEXT' NAME='load' VALUE='{{data['load']}}' /></TD></TR>
+	        <TR><TD>Unload Date</TD><TD><INPUT TYPE='TEXT' NAME='unload' VALUE='{{data['unload']}}' /></TD></TR>
+	    </TABLE>
+	        <INPUT TYPE="hidden" NAME="id" VALUE="{{data['id']}}" />
+	        <INPUT TYPE="SUBMIT" NAME="submit" VALUE="save" />
+	        <INPUT TYPE="SUBMIT" NAME="submit" VALUE="cancel" />
+	    </FORM>
+	</BODY>
+</HTML>

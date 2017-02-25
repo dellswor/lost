@@ -3,7 +3,7 @@ from config import dbname, dbhost, dbport
 import psycopg2
 import datetime
 
-from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo, valid_fcode, valid_atag, put_transit_req, fetch_need_approval, fetch_transit_req, mark_approved, mark_rejected
+from db import html_select_roles, html_select_fcodes, fetch_facilities, put_facility, fetch_assets, put_asset, user_role, del_asset, fetch_userinfo, valid_fcode, valid_atag, put_transit_req, fetch_need_approval, fetch_transit_req, mark_approved, mark_rejected, put_load_unload, fetch_need_load
 
 app = Flask(__name__)
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
@@ -187,6 +187,8 @@ def dashboard():
     to_load    = None
     if session['role']=='Facilities Officer':
         to_approve = fetch_need_approval()
+    if session['role']=='Logistics Officer':
+        to_load = fetch_need_load()
     return render_template('dashboard.html',username=session['username'],to_approve=to_approve,to_load=to_load)
 
 @app.route('/error',methods=('GET',))
@@ -288,6 +290,9 @@ def approve_req():
                 print("db error")
                 session['error']='Invalid Request'
                 return redirect('error')
+            if not data['is_approved']==None:
+                session['error']='Approvel already complete'
+                return redirect('error')
             return render_template('approve_req.html',data=data)
     if request.method=='POST':
         if not 'id' in request.form or not 'submit' in request.form:
@@ -299,6 +304,52 @@ def approve_req():
             mark_approved(session['username'],int(request.form['id']))
         if request.form['submit']=='reject':
             mark_rejected(session['username'],int(request.form['id']))
+        return redirect('dashboard')
+
+@app.route('/update_transit', methods=('GET','POST'))
+def update_transit():
+    if not check_login():
+        return redirect('login')
+    if not session['role']=='Logistics Officer':
+        session['error']='Only a Logistics Officer may load/unload assets'
+        return redirect('error')
+    if request.method=='GET':
+        print(request.args)
+        if not 'id' in request.args:
+            print("no id")
+            session['error']='Invalid Request'
+            return redirect('error')
+        else:
+            transit_pk=int(request.args['id'])
+            try:
+                data = fetch_transit_req(transit_pk)
+            except:
+                print("db error")
+                session['error']='Invalid Request'
+                return redirect('error')
+            if data['load']==None:
+                data['load']='YYYY-MM-DD'
+            if data['unload']==None:
+                data['unload']='YYYY-MM-DD'
+            else:
+                # Unloaded assets can't be updated here
+                session['error']='asset already unloaded'
+                return redirect('error')
+            return render_template('update_req.html',data=data)
+    if request.method=='POST':
+        if not 'id' in request.form or not 'load' in request.form or not 'unload' in request.form or not 'submit' in request.form:
+            session['error']='Invalid Request'
+            return redirect('error')
+        data=dict()
+        data['id']=request.form['id']
+        data['load']=request.form['load']
+        data['unload']=request.form['unload']
+        if data['unload']=='YYYY-MM-DD':
+            data['unload']=None
+        if request.form['submit']=='cancel':
+            pass
+        if request.form['submit']=='save':
+            put_load_unload(session['username'],int(data['id']),data['load'],data['unload'])
         return redirect('dashboard')
 
 if __name__=='__main__':

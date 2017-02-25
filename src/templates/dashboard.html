@@ -17,6 +17,12 @@
 		
 		{% if session['role']=='Logistics Officer' %}
 		<h2>Asset Transits to Process</h2>
+		<table>
+		<tr><th>Date</th><th>Req #</th><th>Asset Tag</th><th>From</th><th>To</th></tr>
+		{% for r in to_load: %}
+		    <tr><td>{{r['date']}}</td><td><a href="{{url_for('update_transit')}}?id={{r['id']}}">{{r['id']}}</a></td><td>{{r['tag']}}</td><td>{{r['src']}}</td><td>{{r['dst']}}</td></tr>
+		{% endfor %}
+		</table>
 		{% endif %}
 		
 		{% if session['role']=='Facilities Officer' %}

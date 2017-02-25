@@ -179,7 +179,7 @@ def put_transit_req(uname,a_tag,src_fcode,dst_fcode):
 def fetch_transit_req(tr_pk):
     with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
         cur = conn.cursor()
-        sql = "SELECT transfer_req, asset_tag, s.fcode, d.fcode FROM transfer_req r JOIN assets a ON a.asset_pk=r.asset_fk JOIN facilities s ON s.facility_pk=r.src_fk JOIN facilities d ON d.facility_pk=r.dst_fk WHERE is_approved is NULL and transfer_req=%s"
+        sql = "SELECT transfer_req, asset_tag, s.fcode, d.fcode, load_dt, loaded_by, unload_dt, unloaded_by, is_approved FROM transfer_req r JOIN assets a ON a.asset_pk=r.asset_fk JOIN facilities s ON s.facility_pk=r.src_fk JOIN facilities d ON d.facility_pk=r.dst_fk WHERE transfer_req=%s"
         cur.execute(sql,(tr_pk,))
         conn.commit()
         res=cur.fetchone()
@@ -188,6 +188,11 @@ def fetch_transit_req(tr_pk):
         ret['tag']=res[1]
         ret['src']=res[2]
         ret['dst']=res[3]
+        ret['load']=res[4]
+        ret['load_by']=res[5]
+        ret['unload']=res[6]
+        ret['unload_by']=res[7]
+        ret['is_approved']=res[8]
         return ret
 
 def mark_approved(uname,tr_pk):
@@ -203,11 +208,42 @@ def mark_rejected(uname,tr_pk):
         sql = "UPDATE transfer_req SET (approved_by,approve_dt,is_approved)=(user_pk,now(),False) FROM users WHERE username=%s AND transfer_req=%s"
         cur.execute(sql,(uname,tr_pk))
         conn.commit()
+
+def put_load_unload(uname,tr_pk,load_dt,unload_dt):
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        if load_dt is not None:
+            sql = "UPDATE transfer_req SET (load_dt,loaded_by)=(%s,user_pk) FROM users WHERE username=%s AND transfer_req=%s"
+            cur.execute(sql,(load_dt,uname,tr_pk))
+            conn.commit()
+        if unload_dt is not None:
+            sql = "UPDATE transfer_req SET (unload_dt,unloaded_by)=(%s,user_pk) FROM users WHERE username=%s AND transfer_req=%s"
+            cur.execute(sql,(load_dt,uname,tr_pk))
+            conn.commit()
+            
         
 def fetch_need_approval():
     with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
         cur = conn.cursor()
         sql = "SELECT transfer_req,t.create_dt,asset_tag,s.fcode,d.fcode FROM transfer_req t JOIN assets a ON a.asset_pk=t.asset_fk JOIN facilities s ON t.src_fk=s.facility_pk JOIN facilities d ON t.dst_fk=d.facility_pk WHERE is_approved IS NULL ORDER BY t.create_dt asc"
+        cur.execute(sql)
+        conn.commit()
+        res = cur.fetchall()
+        ret = list()
+        for r in res:
+            e = dict()
+            e['id'] = r[0]
+            e['date'] = r[1]
+            e['tag'] = r[2]
+            e['src'] = r[3]
+            e['dst'] = r[4]
+            ret.append(e)
+        return ret
+
+def fetch_need_load():
+    with psycopg2.connect(dbname=dbname,host=dbhost,port=dbport) as conn:
+        cur = conn.cursor()
+        sql = "SELECT transfer_req,t.create_dt,asset_tag,s.fcode,d.fcode FROM transfer_req t JOIN assets a ON a.asset_pk=t.asset_fk JOIN facilities s ON t.src_fk=s.facility_pk JOIN facilities d ON t.dst_fk=d.facility_pk WHERE is_approved IS True AND unload_dt IS NULL ORDER BY t.create_dt asc"
         cur.execute(sql)
         conn.commit()
         res = cur.fetchall()
