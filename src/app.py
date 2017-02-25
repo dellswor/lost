@@ -6,6 +6,7 @@ app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 data=list()
 data.append({'id':0, 'name':'Entry one', 'secret':'secret'})
 data.append({'id':1, 'name':'Entry two', 'secret':'password'})
+data.append({'id':2, 'name':'Entry three', 'secret':'yay'})
 
 @app.route('/')
 def index():
